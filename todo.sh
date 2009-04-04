@@ -180,9 +180,13 @@ help()
             priority labels (default).
         -a
             Don't auto-archive tasks automatically on completion
+        -m  LIST_MAXCOUNT
+            Display at most the first LIST_MAXCOUNT tasks
         -n
             Don't preserve line numbers; automatically remove blank lines
             on task deletion
+        -r
+            reverse the display sequence of the listed tasks
         -t
             Prepend the current date to a task automatically
             when it's added.
@@ -203,7 +207,9 @@ help()
         TODOTXT_DATE_ON_ADD=1           is same as option -t
         TODOTXT_VERBOSE=1               is same as option -v
         TODOTXT_DEFAULT_ACTION=""       run this when called with no arguments
-	TODOTXT_SORT_COMMAND="sort ..." customize list output
+        TODOTXT_SORT_COMMAND="sort ..." customize list output
+        TODOTXT_LIST_MAXCOUNT=20        is same as option -m 20
+        TODOTXT_LIST_REVERSE=1          is same as option -r
 EndHelp
 
     if [ -d "$HOME/.todo.actions.d" ]
@@ -251,7 +257,7 @@ archive()
 
 
 # == PROCESS OPTIONS ==
-while getopts ":fhpnatvV+@Pd:" Option
+while getopts ":fhpnatvV+@Prd:m:" Option
 do
   case $Option in
     '@' )
@@ -298,6 +304,9 @@ do
     h )
         shorthelp
         ;;
+    m )
+        TODOTXT_LIST_MAXCOUNT=$OPTARG
+        ;;
     n )
         TODOTXT_PRESERVE_LINE_NUMBERS=0
         ;;
@@ -319,6 +328,9 @@ do
             ## One or odd value -- hide priority labels
             export HIDE_PRIORITY_SUBSTITUTION="([A-Z])[[:space:]]"
         fi
+        ;;
+    r )
+        TODOTXT_LIST_REVERSE=1
         ;;
     t )
         TODOTXT_DATE_ON_ADD=1
@@ -343,6 +355,8 @@ TODOTXT_AUTO_ARCHIVE=${TODOTXT_AUTO_ARCHIVE:-1}
 TODOTXT_DATE_ON_ADD=${TODOTXT_DATE_ON_ADD:-0}
 TODOTXT_DEFAULT_ACTION=${TODOTXT_DEFAULT_ACTION:-}
 TODOTXT_SORT_COMMAND=${TODOTXT_SORT_COMMAND:-env LC_COLLATE=C sort -f -k2}
+TODOTXT_LIST_MAXCOUNT=${TODOTXT_LIST_MAXCOUNT:-0}
+TODOTXT_LIST_REVERSE=${TODOTXT_LIST_REVERSE:-0}
 
 [ -e "$TODOTXT_CFG_FILE" ] || {
     CFG_FILE_ALT="$HOME/.todo.cfg"
@@ -353,7 +367,7 @@ TODOTXT_SORT_COMMAND=${TODOTXT_SORT_COMMAND:-env LC_COLLATE=C sort -f -k2}
     fi
 }
 
-export TODOTXT_VERBOSE TODOTXT_PLAIN TODOTXT_CFG_FILE TODOTXT_FORCE TODOTXT_PRESERVE_LINE_NUMBERS TODOTXT_AUTO_ARCHIVE TODOTXT_DATE_ON_ADD  TODOTXT_SORT_COMMAND
+export TODOTXT_VERBOSE TODOTXT_PLAIN TODOTXT_CFG_FILE TODOTXT_FORCE TODOTXT_PRESERVE_LINE_NUMBERS TODOTXT_AUTO_ARCHIVE TODOTXT_DATE_ON_ADD  TODOTXT_SORT_COMMAND TODOTXT_LIST_MAXCOUNT TODOTXT_LIST_REVERSE
 
 TODO_SH="$0"
 export TODO_SH
@@ -477,6 +491,20 @@ _list() {
             s/'${HIDE_CONTEXTS_SUBSTITUTION:-^}'//g
           '''                                                   \
     )
+    if [ $TODOTXT_LIST_MAXCOUNT -gt 0 ]
+    then
+        filtered_items=$(
+            echo -ne "$filtered_items"                              \
+            | grep -m $TODOTXT_LIST_MAXCOUNT .                      \
+        )
+    fi
+    if [ $TODOTXT_LIST_REVERSE -gt 0 ]
+    then
+        filtered_items=$(
+            echo -ne "$filtered_items${filtered_items:+\n}"         \
+            | tail -r                                               \
+        )
+    fi
     echo -ne "$filtered_items${filtered_items:+\n}"
 
     if [ $TODOTXT_VERBOSE -gt 0 ]; then
