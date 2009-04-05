@@ -1,6 +1,11 @@
 #!/bin/bash
 #
 action=$1
+
+# now shift the positional parameters to the right, past
+# the plug-in action, so that they can be pasted to the
+# built-in actions.
+#
 shift
 
 [ "$action" = "usage" ] && {
@@ -10,10 +15,18 @@ shift
   exit
 }
 
+# try to add the item
+#
 if "$TODO_SH" command add "$@"; then
-    # getting the number item: it's simply the last item added to the file
+
+    # getting the number item: 
+    # it's simply the last item added to the file
+    #
     line=`wc -l "$TODO_FILE" | sed "s/^[[:space:]]*//" | cut -d' ' -f1`
-    echo "line is " $line
+
+    # now mark the item done
+    #
     "$TODO_SH" command do $line 
+
 fi
 
