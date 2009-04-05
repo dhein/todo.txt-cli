@@ -9,3 +9,11 @@ shift
   echo "" 
   exit
 }
+
+if "$TODO_SH" command add "$@"; then
+    # getting the number item: it's simply the last item added to the file
+    line=`wc -l "$TODO_FILE" | sed "s/^[[:space:]]*//" | cut -d' ' -f1`
+    echo "line is " $line
+    "$TODO_SH" command do $line 
+fi
+
