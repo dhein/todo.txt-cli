@@ -9,11 +9,58 @@ action=$1
 shift
 
 [ "$action" = "usage" ] && {
-  echo "  did:" 
-  echo "    like add, but adds the task as already done."
-  echo "" 
+    sed -e 's/^    //' <<EndUsage
+      did "THING I ALREADY DID +project @context"
+      did 2009-03-04 "THING I ALREADY DID +project @context"
+      did 3-04 "THING I ALREADY DID +project @context"
+      did 4 "THING I ALREADY DID +project @context"
+        Adds THING I ALREADY DID to your done.txt file.
+        If no date is specified, current date is used.
+        You can specify the date as YYYY-MM-DD, or MM-DD,
+        or DD; if a short form is used and is greater than
+        the current MM-DD or DD, then prior YYYY or MM is
+        assumed. (So if today was 2009-03-04 and you specified
+        27, then did2 will assign a done date of 2009-02-27.)
+EndUsage
   exit
 }
+
+# see if a date was supplied
+#
+OVERRIDE_DATE_=false
+DID_DATE_=`date +%F`
+DID_YYYY_=$(echo $DID_DATE_ | sed 's/\([0-9]*\)-[0-9]*-[0-9]*/\1/g')
+DID_MM_=$(echo $DID_DATE_ | sed 's/[0-9]*-\([0-9]*\)-[0-9]*/\1/g')
+DID_DD_=$(echo $DID_DATE_ | sed 's/[0-9]*-[0-9]*-\([0-9]\)*/\1/g')
+if [[ "$1" =~ ^[0-9]{4}-[0-9]{1,2}-[0-9]{1,2}$ ]]; then
+    OVERRIDE_DATE_=true
+    DID_DATE_=`date +%F --date "$1"`
+elif [[ "$1" =~ ^[0-9]{1,2}-[0-9]{1,2}$ ]]; then
+    OVERRIDE_DATE_=true
+    ALT_YYYY_=${DID_YYYY_}
+    echo "B4: ALT_YYYY_ = $ALT_YYYY_"
+    ALT_MM_=$(echo $1 | sed 's/\([0-9]*\)-[0-9]*/\1/g')
+    ALT_DD_=$(echo $1 | sed 's/[0-9]*-\([0-9]*\)/\1/g')
+    if [ $ALT_MM_ -gt $DID_MM_ ]; then
+        ALT_YYYY_=$((DID_YYYY_ - 1))
+    fi
+    DID_DATE_=`date +%F --date "$ALT_YYYY_-$ALT_MM_-$ALT_DD_"`
+elif [[ "$1" =~ ^[0-9]{1,2}$ ]]; then
+    OVERRIDE_DATE_=true
+    ALT_YYYY_=$DID_YYYY_
+    ALT_MM_=$DID_MM_
+    ALT_DD_=$(echo $1 | sed 's/\([0-9]*\)/\1/g')
+    if [ $ALT_DD_ -gt $DID_DD_ ]; then
+        ALT_MM_=$(date +%F --date "-$DID_DD_ days" \
+               | sed 's/[0-9]*-\([0-9]*\)-[0-9]*/\1/g')
+    fi
+    DID_DATE_=`date +%F --date "$ALT_YYYY_-$ALT_MM_-$ALT_DD_"`
+fi
+if [ x$DID_DATE_ == x ]; then
+  exit
+elif $OVERRIDE_DATE_ ; then
+  shift
+fi
 
 # try to add the item
 #
@@ -26,7 +73,17 @@ if "$TODO_SH" command add "$@"; then
 
     # now mark the item done
     #
-    "$TODO_SH" command do $line 
-
+    if "$TODO_SH" command do $line; then
+        if $OVERRIDE_DATE_ && [ $TODOTXT_AUTO_ARCHIVE = 1 ]; then
+            # adjust done.txt
+            [ $TODOTXT_VERBOSE -gt 0 ] && echo \
+                "TODO: Adjusting $line to $DID_DATE_"
+        elif $OVERRIDE_DATE_ ; then
+            # adjust todo.txt
+            [ $TODOTXT_VERBOSE -gt 0 ] && echo \
+                "TODO: Adjusting $line to $DID_DATE_"
+            sed -i.bak $line"s|^x [0-9]\{4\}-[0-9]\{1,2\}-[0-9]\{1,2\}[[:space:]]|x $DID_DATE_ |" "$TODO_FILE"
+        fi
+    fi
 fi
 
