@@ -32,10 +32,10 @@ DID_DATE_=`date +%F`
 DID_YYYY_=$(echo $DID_DATE_ | sed 's/\([0-9]*\)-[0-9]*-[0-9]*/\1/g')
 DID_MM_=$(echo $DID_DATE_ | sed 's/[0-9]*-\([0-9]*\)-[0-9]*/\1/g')
 DID_DD_=$(echo $DID_DATE_ | sed 's/[0-9]*-[0-9]*-\([0-9]\)*/\1/g')
-if [[ "$1" =~ ^[0-9]{4}-[0-9]{1,2}-[0-9]{1,2}$ ]]; then
+if echo "$1" | grep ^[0-9]\{4\}-[0-9]\{1,2\}-[0-9]\{1,2\}$ ; then
     OVERRIDE_DATE_=true
     DID_DATE_=`date +%F --date "$1"`
-elif [[ "$1" =~ ^[0-9]{1,2}-[0-9]{1,2}$ ]]; then
+elif echo "$1" | ^[0-9]\{1,2\}-[0-9]\{1,2\}$ ; then
     OVERRIDE_DATE_=true
     ALT_YYYY_=${DID_YYYY_}
     echo "B4: ALT_YYYY_ = $ALT_YYYY_"
@@ -45,7 +45,7 @@ elif [[ "$1" =~ ^[0-9]{1,2}-[0-9]{1,2}$ ]]; then
         ALT_YYYY_=$((DID_YYYY_ - 1))
     fi
     DID_DATE_=`date +%F --date "$ALT_YYYY_-$ALT_MM_-$ALT_DD_"`
-elif [[ "$1" =~ ^[0-9]{1,2}$ ]]; then
+elif echo "$1" | ^[0-9]\{1,2\}$ ; then
     OVERRIDE_DATE_=true
     ALT_YYYY_=$DID_YYYY_
     ALT_MM_=$DID_MM_
