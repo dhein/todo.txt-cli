@@ -8,6 +8,24 @@ action=$1
 #
 shift
 
+[ "$action" = "version" ] && {
+    sed -e 's/^    //' <<EndVersion
+      edit Add-on, version 1.0.0.
+
+        First release: 9-APR-2009
+        Author: Dave Hein
+        License: GPL, http://www.gnu.org/copyleft/gpl.html
+EndVersion
+    exit
+}
+
+[ "$action" = "usage-short" ] && {
+    sed -e 's/^    //' <<EndUsage
+      edit [todo|done|cfg]
+EndUsage
+  exit
+}
+
 [ "$action" = "usage" ] && {
     sed -e 's/^    //' <<EndUsage
       edit [todo|done|cfg]

@@ -8,14 +8,36 @@ action=$1
 #
 shift
 
+[ "$action" = "version" ] && {
+    sed -e 's/^    //' <<EndVersion
+      cd Add-on, version 1.0.0.
+
+        First release: 9-APR-2009
+        Author: Dave Hein
+        License: GPL, http://www.gnu.org/copyleft/gpl.html
+EndVersion
+    exit
+}
+
+[ "$action" = "usage-short" ] && {
+    sed -e 's/^    //' <<EndUsage
+      cd [todo|addons|cfg]
+EndUsage
+  exit
+}
+
 [ "$action" = "usage" ] && {
     sed -e 's/^    //' <<EndUsage
       cd [todo|addons|cfg]
-        Changes the current directory to the directory
+        Does not actually change the directory, but
+        does output the command necessary for you to
+        change the current directory to the directory
         holding the todo.txt and done.txt files (todo),
         the directory holding the addons (addons),
         or the directory holding the todo.cfg file (cfg).
         Defaults to the directory holding todo.txt.
+        You can copy/paste the output and execute it
+        if you wish to actually change the directory.
 EndUsage
   exit
 }
