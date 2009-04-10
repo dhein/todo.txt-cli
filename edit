@@ -1,0 +1,65 @@
+#!/bin/bash
+#
+action=$1
+
+# now shift the positional parameters to the right, past
+# the plug-in action, so that they can be pasted to the
+# built-in actions.
+#
+shift
+
+[ "$action" = "version" ] && {
+    sed -e 's/^    //' <<EndVersion
+      edit Add-on, version 1.0.0.
+
+        First release: 9-APR-2009
+        Author: Dave Hein
+        License: GPL, http://www.gnu.org/copyleft/gpl.html
+EndVersion
+    exit
+}
+
+[ "$action" = "usage-short" ] && {
+    sed -e 's/^    //' <<EndUsage
+      edit [todo|done|cfg]
+EndUsage
+  exit
+}
+
+[ "$action" = "usage" ] && {
+    sed -e 's/^    //' <<EndUsage
+      edit [todo|done|cfg]
+        Edits either the todo.txt, done.txt, or todo.cfg
+        files. If no arg is supplied, todo.txt will be
+        edited. The editor invoked defaults to vi, but
+        can be overridden by specifying TODO_EDITOR_
+        in your todo.cfg file.
+EndUsage
+  exit
+}
+
+# see if an editor was supplied
+#
+if [ x"$TODO_EDITOR_" == x ] ; then
+  TODO_EDITOR_=vi
+fi
+
+# see which file, if any was specified
+#
+if [ x"$1" == x ] ; then
+  TODO_EDIT_FILE_="$TODO_DIR/todo.txt"
+elif echo "$1" | grep -iq ^todo$ ; then
+  TODO_EDIT_FILE_="$TODO_DIR/todo.txt"
+elif echo "$1" | grep -iq ^done$ ; then
+  TODO_EDIT_FILE_="$TODO_DIR/done.txt"
+elif echo "$1" | grep -iq ^cfg$ ; then
+  TODO_EDIT_FILE_="$TODOTXT_CFG_FILE"
+else
+  echo "'$1' is an invalid argument."
+  exit
+fi
+
+# edit the file
+#
+"$TODO_EDITOR_" "$TODO_EDIT_FILE_"
+exit
