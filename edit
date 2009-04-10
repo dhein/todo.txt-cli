@@ -12,7 +12,7 @@ shift
 
 [ "$action" = "usage" ] && [[ "$1" == "version" ]] && {
     sed -e 's/^    //' <<EndVersion
-      edit Add-on, version 1.0.1.
+      edit Add-on, version 1.0.2.
 
         First release: 9-APR-2009
         Author: Dave Hein
@@ -32,14 +32,13 @@ EndUsage
     sed -e 's/^    //' <<EndUsage
       edit [todo|done|cfg]
       edit [item]
-        Edits either the todo.txt, done.txt, or todo.cfg
-        files. If no arg is supplied, todo.txt will be
-        edited. If a numeric item number is supplied,
-        the todo.txt is edited, with the item scrolled
-        to the top of the screen (assuming you use vi or
-        emacs). The editor invoked defaults to vi, but
-        will use the EDITOR environment variable if
-        it is set.
+        Edits either the todo.txt, done.txt, or
+        todo.cfg files. If no arg is supplied, todo.txt
+        will be edited. If a numeric item number is
+        supplied, the todo.txt is edited, with the cursor
+        sitting on that line (assuming you use vi or emacs). 
+        The editor invoked uses the EDITOR environment
+        variable, or defaults to vi.
 EndUsage
   exit
 }
