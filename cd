@@ -49,7 +49,7 @@ if [ x"$1" == x ] ; then
 elif echo "$1" | grep -iq ^todo$ ; then
   TODO_CD_TO_="$TODO_DIR"
 elif echo "$1" | grep -iq ^addons$ ; then
-  TODO_CD_TO_="$HOME"/.todo.actions.d
+  TODO_CD_TO_="$TODO_ACTIONS_DIR"
 elif echo "$1" | grep -iq ^cfg$ ; then
   TODO_CD_TO_=$(echo "$TODOTXT_CFG_FILE" | sed 's|\(.*\)/todo.cfg|\1|')
 else
