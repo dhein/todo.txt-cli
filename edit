@@ -8,9 +8,9 @@ action=$1
 #
 shift
 
-[ "$action" = "version" ] && {
+[ "$action" = "usage" ] && [[ "$1" == "version" ]] && {
     sed -e 's/^    //' <<EndVersion
-      edit Add-on, version 1.0.0.
+      edit Add-on, version 1.0.1.
 
         First release: 9-APR-2009
         Author: Dave Hein
@@ -19,7 +19,7 @@ EndVersion
     exit
 }
 
-[ "$action" = "usage-short" ] && {
+[ "$action" = "usage" ] && [[ "$1" == "short" ]] && {
     sed -e 's/^    //' <<EndUsage
       edit [todo|done|cfg]
 EndUsage
