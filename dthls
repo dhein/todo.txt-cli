@@ -64,6 +64,17 @@ EndUsage
   exit
 }
 
+# Capture the state of the -+@P options
+#
+if [ x$HIDE_CONTEXTS_SUBSTITUTION != x ] ; then
+  HIDE_CONTEXT_NAMES=1
+fi
+if [ x$HIDE_PROJECTS_SUBSTITUTION != x ] ; then
+  HIDE_PROJECT_NAMES=1
+fi
+if [ x$HIDE_PRIORITY_SUBSTITUTION != x ] ; then
+  HIDE_PRIORITY_LABELS=1
+fi
 
 # == PROCESS OPTIONS ==
 OPTIND=1
@@ -129,11 +140,11 @@ do
         ;;
   esac
 done
+#echo "before shift \$@ is $@"
 shift $(($OPTIND - 1))
+#echo "after shift \$@ is $@"
 
-shift  ## Was ls; new $1 is first search term
-_list "$TODO_FILE" "$@"
-
-cleanup
+echo "$TODO_SH" command ls "$@"
+"$TODO_SH" command ls "$@"
 
 exit
