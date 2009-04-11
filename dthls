@@ -75,6 +75,8 @@ fi
 if [ x$HIDE_PRIORITY_SUBSTITUTION != x ] ; then
   HIDE_PRIORITY_LABELS=1
 fi
+export TODOTXT_LIST_MAXCOUNT=0
+export TODOTXT_LIST_REVERSE=0
 
 # == PROCESS OPTIONS ==
 OPTIND=1
@@ -116,7 +118,7 @@ do
         fi
         ;;
     m )
-        TODOTXT_LIST_MAXCOUNT=$OPTARG
+        export TODOTXT_LIST_MAXCOUNT=$OPTARG
         ;;
     P )
         ## HIDE_PRIORITY_LABELS starts at zero (false); increment it to one
@@ -134,6 +136,10 @@ do
             export HIDE_PRIORITY_SUBSTITUTION="([A-Z])[[:space:]]"
         fi
         ;;
+    r )
+        export TODOTXT_LIST_REVERSE=1
+        ;;
+
     '?' )
         echo "Unrecognized option '-$OPTARG'."
         exit
