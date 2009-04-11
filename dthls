@@ -79,11 +79,12 @@ export TODOTXT_LIST_MAXCOUNT=0
 export TODOTXT_LIST_REVERSE=0
 
 # == PROCESS OPTIONS ==
+LIST_MAX_=0
+LIST_REVERSE_=0
 OPTIND=1
 #while getopts "+@Prl:m:" Option
 while getopts ":+@Prl:m:" Option
 do
-  echo "\$Option is $Option; \$OPTIND is OPTIND"
   case $Option in
     '@' )
         ## HIDE_CONTEXT_NAMES starts at zero (false); increment it to one
@@ -118,7 +119,7 @@ do
         fi
         ;;
     m )
-        export TODOTXT_LIST_MAXCOUNT=$OPTARG
+        LIST_MAX_=$OPTARG
         ;;
     P )
         ## HIDE_PRIORITY_LABELS starts at zero (false); increment it to one
@@ -137,7 +138,7 @@ do
         fi
         ;;
     r )
-        export TODOTXT_LIST_REVERSE=1
+        LIST_REVERSE_=1
         ;;
 
     '?' )
@@ -146,11 +147,17 @@ do
         ;;
   esac
 done
-#echo "before shift \$@ is $@"
 shift $(($OPTIND - 1))
-#echo "after shift \$@ is $@"
 
-echo "$TODO_SH" command ls "$@"
+# Set TODOTXT_SORT_COMMAND if necessary
+#
+if [ 0 -lt $LIST_MAX_ ] ; then
+  TODOTXT_SORT_COMMAND="$TODOTXT_SORT_COMMAND | grep -m $LIST_MAX_ ."
+fi
+if [ 0 -lt $LIST_REVERSE_  ] ; then
+  TODOTXT_SORT_COMMAND="$TODOTXT_SORT_COMMAND | tail -r"
+fi
+
 "$TODO_SH" command ls "$@"
 
 exit
