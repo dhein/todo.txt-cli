@@ -81,6 +81,7 @@ export TODOTXT_LIST_REVERSE=0
 # == PROCESS OPTIONS ==
 LIST_MAX_=0
 LIST_REVERSE_=0
+LIST_LEN_=0
 OPTIND=1
 #while getopts "+@Prl:m:" Option
 while getopts ":+@Prl:m:" Option
@@ -118,6 +119,9 @@ do
             export HIDE_PROJECTS_SUBSTITUTION='[[:space:]][+][^[:space:]]\{1,\}'
         fi
         ;;
+    l )
+        LIST_LEN_=$OPTARG
+        ;;
     m )
         LIST_MAX_=$OPTARG
         ;;
@@ -154,10 +158,21 @@ shift $(($OPTIND - 1))
 if [ 0 -lt $LIST_MAX_ ] ; then
   TODOTXT_SORT_COMMAND="$TODOTXT_SORT_COMMAND | grep -m $LIST_MAX_ ."
 fi
+
 if [ 0 -lt $LIST_REVERSE_  ] ; then
   TODOTXT_SORT_COMMAND="$TODOTXT_SORT_COMMAND | tail -r"
 fi
 
+# put this here so that it does not affect the sort order
+#
+if [ 10 -lt $LIST_LEN_  ] ; then
+  LL_=$((LIST_LEN_ - 3))
+  LL_CMD_="sed 's/^\(.\{$LL_\}\).....*$/\1.../'"
+  export TODOTXT_SORT_COMMAND="$TODOTXT_SORT_COMMAND | $LL_CMD_"
+fi
+
+# Invoke the list command
+#
 "$TODO_SH" command ls "$@"
 
 exit
