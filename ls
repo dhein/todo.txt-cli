@@ -61,6 +61,14 @@ EndUsage
           -r
               reverse the display sequence of the listed tasks. Use twice
               to display in normal sequence (default).
+
+       Note:
+         You can set default options for this addon by setting
+         the varialbe TODOTXT_LS_DEFOPT_ in your config file.
+
+         For example:
+             setvar TODOTXT_LS_DEFOPT_ "-m 30 -l 80"
+
 EndUsage
   exit
 }
@@ -80,14 +88,9 @@ export TODOTXT_LIST_MAXCOUNT=0
 export TODOTXT_LIST_REVERSE=0
 
 # == PROCESS OPTIONS ==
-LIST_MAX_=0
-LIST_REVERSE_=0
-LIST_LEN_=0
-OPTIND=1
-#while getopts "+@Prl:m:" Option
-while getopts ":+@Prl:m:" Option
-do
-  case $Option in
+processOptions()
+{
+  case $1 in
     '@' )
         ## HIDE_CONTEXT_NAMES starts at zero (false); increment it to one
         ##   (true) the first time this flag is seen. Each time the flag
@@ -121,10 +124,10 @@ do
         fi
         ;;
     l )
-        LIST_LEN_=$OPTARG
+        LIST_LEN_=$2
         ;;
     m )
-        LIST_MAX_=$OPTARG
+        LIST_MAX_=$2
         ;;
     P )
         ## HIDE_PRIORITY_LABELS starts at zero (false); increment it to one
@@ -147,10 +150,33 @@ do
         ;;
 
     '?' )
-        echo "Unrecognized option '-$OPTARG'."
+        echo "Unrecognized option '-$2'."
         exit
         ;;
   esac
+}
+
+LIST_MAX_=0
+LIST_REVERSE_=0
+LIST_LEN_=0
+
+# process default options
+#
+OPTIND=1
+if [ x"$TODOTXT_LS_DEFOPT_" != x ]
+then
+  while eval "getopts \":+@Prl:m:\" Option $TODOTXT_LS_DEFOPT_"
+  do
+    processOptions $Option $OPTARG
+  done
+fi
+
+# process command line options
+#
+OPTIND=1
+while getopts ":+@Prl:m:" Option
+do
+  processOptions $Option $OPTARG
 done
 shift $(($OPTIND - 1))
 
