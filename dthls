@@ -51,6 +51,7 @@ EndUsage
               Truncates displayed lines at LEN, displaying ellipses
               (...) if line length is longer. -l 0 does not truncate.
               If specified multiple times, the last one wins.
+              LEN ignored if less than or equal to 10.
           -m  MAX
               Display at most the first LIST_MAXCOUNT tasks
               If specified multiple times, the last one wins.
@@ -163,12 +164,12 @@ if [ 0 -lt $LIST_REVERSE_  ] ; then
   TODOTXT_SORT_COMMAND="$TODOTXT_SORT_COMMAND | tail -r"
 fi
 
-# put this here so that it does not affect the sort order
-#
 if [ 10 -lt $LIST_LEN_  ] ; then
-  LL_=$((LIST_LEN_ - 3))
-  LL_CMD_="sed 's/^\(.\{$LL_\}\).....*$/\1.../'"
-  export TODOTXT_SORT_COMMAND="$TODOTXT_SORT_COMMAND | $LL_CMD_"
+  LL1_=$((LIST_LEN_ - 3))
+  LL2_=$((LIST_LEN_ - 3 - 4))
+  LL1_CMD_="sed 's/^\(\\\\033\[[0-9;]*m\)\(.\{$LL1_\}\).....*\(\\\\033\[[0-9;]*m\)$/\1\2...\3/'"
+  LL2_CMD_="sed 's/^\([^\][^0][^3][^3].\{$LL2_\}\).....*$/\1.../'"
+  export TODOTXT_FINAL_FILTER="$LL1_CMD_ | $LL2_CMD_"
 fi
 
 # Invoke the list command
