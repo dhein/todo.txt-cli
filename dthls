@@ -156,7 +156,7 @@ shift $(($OPTIND - 1))
 # Set TODOTXT_SORT_COMMAND if necessary
 #
 if [ 0 -lt $LIST_MAX_ ] ; then
-  TODOTXT_SORT_COMMAND="$TODOTXT_SORT_COMMAND | grep -m $LIST_MAX_ ."
+  TODOTXT_SORT_COMMAND="$TODOTXT_SORT_COMMAND | head -n $LIST_MAX_"
 fi
 
 if [ 0 -lt $LIST_REVERSE_  ] ; then
