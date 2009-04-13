@@ -204,6 +204,7 @@ help()
         TODOTXT_VERBOSE=1               is same as option -v
         TODOTXT_DEFAULT_ACTION=""       run this when called with no arguments
         TODOTXT_SORT_COMMAND="sort ..." customize list output
+        TODOTXT_FINAL_FILTER=="sed ..." customize list after color, P@+ hiding
 EndHelp
 
     if [ -d "$TODO_ACTIONS_DIR" ]
@@ -249,6 +250,38 @@ archive()
     cleanup
 }
 
+setvar()
+{
+  # check that there are two args
+  #
+  if [ 2 -ne $# ] ; then
+    echo "Warning: setvar: called with incorrect arg list."
+    return 1;
+  fi
+
+  # validate the arguments
+  #
+  # ?? how to check if $1 is a valid var name?
+  #
+  LHS_=$1
+  RHS_=$2
+
+  # if the variable is already set to a value, then
+  # do nothing, just get out
+  #
+  if [ x"${!LHS_}" != x ] ; then
+    return 0;
+  fi
+
+  # set the value
+  #
+  eval "export $LHS_=\"$RHS_\"" && return 0;
+
+  # could not set the variable
+  #
+  echo "setvar: could not set $1"
+  return 1;
+}
 
 # == PROCESS OPTIONS ==
 while getopts ":fhpnatvV+@Pd:" Option
@@ -333,19 +366,6 @@ do
 done
 shift $(($OPTIND - 1))
 
-# defaults if not yet defined
-TODOTXT_VERBOSE=${TODOTXT_VERBOSE:-1}
-TODOTXT_PLAIN=${TODOTXT_PLAIN:-0}
-TODOTXT_CFG_FILE=${TODOTXT_CFG_FILE:-$HOME/todo.cfg}
-TODOTXT_FORCE=${TODOTXT_FORCE:-0}
-TODOTXT_PRESERVE_LINE_NUMBERS=${TODOTXT_PRESERVE_LINE_NUMBERS:-1}
-TODOTXT_AUTO_ARCHIVE=${TODOTXT_AUTO_ARCHIVE:-1}
-TODOTXT_DATE_ON_ADD=${TODOTXT_DATE_ON_ADD:-0}
-TODOTXT_DEFAULT_ACTION=${TODOTXT_DEFAULT_ACTION:-}
-TODOTXT_SORT_COMMAND=${TODOTXT_SORT_COMMAND:-env LC_COLLATE=C sort -f -k2}
-
-export TODOTXT_VERBOSE TODOTXT_PLAIN TODOTXT_CFG_FILE TODOTXT_FORCE TODOTXT_PRESERVE_LINE_NUMBERS TODOTXT_AUTO_ARCHIVE TODOTXT_DATE_ON_ADD TODOTXT_SORT_COMMAND
-
 # Default color map
 export NONE=''
 export BLACK='\\033[0;30m'
@@ -366,12 +386,6 @@ export LIGHT_CYAN='\\033[1;36m'
 export WHITE='\\033[1;37m'
 export DEFAULT='\\033[0m'
 
-# Default priority->color map.
-export PRI_A=$YELLOW        # color for A priority
-export PRI_B=$GREEN         # color for B priority
-export PRI_C=$LIGHT_BLUE    # color for C priority
-export PRI_X=$WHITE         # color for rest of them
-
 [ -e "$TODOTXT_CFG_FILE" ] || {
     CFG_FILE_ALT="$HOME/.todo.cfg"
 
@@ -381,20 +395,48 @@ export PRI_X=$WHITE         # color for rest of them
     fi
 }
 
-if [ -z "$TODO_ACTIONS_DIR" -o ! -d "$TODO_ACTIONS_DIR" ]
-then
-    TODO_ACTIONS_DIR="$HOME/.todo.actions.d"
-    export TODO_ACTIONS_DIR
-fi
-
 TODO_SH="$0"
 export TODO_SH
 
 # === SANITY CHECKS (thanks Karl!) ===
 [ -r "$TODOTXT_CFG_FILE" ] || die "Fatal error: Cannot read configuration file $TODOTXT_CFG_FILE"
 
+# === Source the config file ===
+#
 . "$TODOTXT_CFG_FILE"
 
+# set the actions directory
+#
+if [ -z "$TODO_ACTIONS_DIR" -o ! -d "$TODO_ACTIONS_DIR" ]
+then
+    TODO_ACTIONS_DIR="$HOME/.todo.actions.d"
+    export TODO_ACTIONS_DIR
+fi
+
+# Default priority->color map.
+#
+export PRI_A=${PRI_A:-$YELLOW}        # color for A priority
+export PRI_B=${PRI_B:-$GREEN}         # color for B priority
+export PRI_C=${PRI_C:-$LIGHT_BLUE}    # color for C priority
+export PRI_X=${PRI_X:-$WHITE}         # color for rest of them
+
+# defaults if not yet defined
+#
+TODOTXT_VERBOSE=${TODOTXT_VERBOSE:-1}
+TODOTXT_PLAIN=${TODOTXT_PLAIN:-0}
+TODOTXT_CFG_FILE=${TODOTXT_CFG_FILE:-$HOME/todo.cfg}
+TODOTXT_FORCE=${TODOTXT_FORCE:-0}
+TODOTXT_PRESERVE_LINE_NUMBERS=${TODOTXT_PRESERVE_LINE_NUMBERS:-1}
+TODOTXT_AUTO_ARCHIVE=${TODOTXT_AUTO_ARCHIVE:-1}
+TODOTXT_DATE_ON_ADD=${TODOTXT_DATE_ON_ADD:-0}
+TODOTXT_DEFAULT_ACTION=${TODOTXT_DEFAULT_ACTION:-}
+TODOTXT_SORT_COMMAND=${TODOTXT_SORT_COMMAND:-env LC_COLLATE=C sort -f -k2 -}
+TODOTXT_FINAL_FILTER=${TODOTXT_FINAL_FILTER:-cat}
+
+export TODOTXT_VERBOSE TODOTXT_PLAIN TODOTXT_CFG_FILE TODOTXT_FORCE TODOTXT_PRESERVE_LINE_NUMBERS TODOTXT_AUTO_ARCHIVE TODOTXT_DATE_ON_ADD TODOTXT_SORT_COMMAND TODOTXT_FINAL_FILTER
+
+# more sanity checks
+#
 ACTION=${1:-$TODOTXT_DEFAULT_ACTION}
 
 [ -z "$ACTION" ]    && usage
@@ -494,7 +536,7 @@ _list() {
             s/^  /00/;
             s/^ /0/;
           ''' \
-        | ${TODOTXT_SORT_COMMAND}                                        \
+        | eval ${TODOTXT_SORT_COMMAND}                         \
         | sed '''
             /^[0-9]\{'$PADDING'\} x /! {
                 s/\(.*(A).*\)/'$PRI_A'\1'$DEFAULT'/g;
@@ -508,6 +550,7 @@ _list() {
             s/'${HIDE_PROJECTS_SUBSTITUTION:-^}'//g
             s/'${HIDE_CONTEXTS_SUBSTITUTION:-^}'//g
           '''                                                   \
+        | eval ${TODOTXT_FINAL_FILTER}                          \
     )
     echo -ne "$filtered_items${filtered_items:+\n}"
 
