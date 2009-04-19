@@ -18,7 +18,7 @@ shift
 #
 [ "$action" = "usage" ] && [[ "$2" == "version" ]] && {
     sed -e 's/^    //' <<EndVersion
-      dthls Add-on, version 0.0.0.
+      ls Add-on, version 0.0.0.
 
         First release: 10-APR-2009
         Author: Dave Hein
@@ -29,14 +29,14 @@ EndVersion
 
 [ "$action" = "usage" ] && [[ "$2" == "short" ]] && {
     sed -e 's/^    //' <<EndUsage
-      dthls [-@+Pr] [-m MAX]  [-l LEN] [TERM...] 
+      ls [-@+Pr] [-m MAX]  [-l LEN] [TERM...] 
 EndUsage
   exit
 }
 
 [ "$action" = "usage" ] && {
     sed -e 's/^    //' <<EndUsage
-      dthls [-@+Pr] [-m MAX]  [-l LEN] [TERM...] 
+      ls [-@+Pr] [-m MAX]  [-l LEN] [TERM...] 
         Displays all todo's that contain TERM(s) sorted by priority with line
         numbers.  If no TERM specified, lists entire todo.txt.
 
