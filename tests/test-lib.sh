@@ -37,7 +37,9 @@ VISUAL=:
 unset CDPATH
 
 # Protect ourselves from using predefined TODOTXT_CFG_FILE
-unset TODOTXT_CFG_FILE
+unset TODOTXT_CFG_FILE $(set|sed '/^TODOTXT_/!d;s/=.*//')
+# To prevent any damage if someone has still those exported somehow in his env:
+unset TODO_FILE DONE_FILE REPORT_FILE TMP_FILE
 
 # Each test should start with something like this, after copyright notices:
 #
@@ -407,6 +409,10 @@ test_done () {
 	esac
 }
 
+# Use -P to resolve symlinks in our working directory so that the pwd
+# in subprocesses equals our $PWD (for pathname comparisons).
+cd -P .
+
 # Record our location for reference.
 TEST_DIRECTORY=$(pwd)
 
@@ -446,21 +452,21 @@ test_init_todo () {
 	#date --version
 	#date (GNU coreutils) 6.10
 	#...
-	if date --version 2>&1 |grep -q "GNU"; then
+	if date --version 2>&1 | grep -q "GNU"; then
 		DATE_STYLE=GNU
 	# on Mac OS X 10.5:
 	#date --version
 	#date: illegal option -- -
 	#usage: date [-jnu] [-d dst] [-r seconds] [-t west] [-v[+|-]val[ymwdHMS]] ...
 	#[-f fmt date | [[[mm]dd]HH]MM[[cc]yy][.ss]] [+format]
-	elif date --version 2>&1 | grep -q "\-jnu"; then
+	elif date --version 2>&1 | grep -q -e "-jnu"; then
 		DATE_STYLE=Mac10.5
 	# on Mac OS X 10.4:
 	#date --version
 	#date: illegal option -- -
 	#usage: date [-nu] [-r seconds] [+format]
 	#       date [[[[[cc]yy]mm]dd]hh]mm[.ss]
-	elif date --version 2>&1 |grep -q "\-nu"; then
+	elif date --version 2>&1 | grep -q -e "-nu"; then
 		DATE_STYLE=Mac10.4
 	fi
 
@@ -572,7 +578,7 @@ EOF
 }
 
 test_init_todo "$test"
-# Use -P to resolve symlinks in our working directory so that the cwd
+# Use -P to resolve symlinks in our working directory so that the pwd
 # in subprocesses equals our $PWD (for pathname comparisons).
 cd -P "$test" || exit 1
 
