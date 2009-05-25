@@ -22,11 +22,11 @@ Try 'todo.sh -h' for more information.
 EOF
 
 cat > test.cfg << EOF
-export TODO_DIR=.
-export TODO_FILE="\$TODO_DIR/todo.txt"
-export DONE_FILE="\$TODO_DIR/done.txt"
-export REPORT_FILE="\$TODO_DIR/report.txt"
-export TMP_FILE="\$TODO_DIR/todo.tmp"
+TODO_DIR=.
+TODO_FILE="\$TODO_DIR/todo.txt"
+DONE_FILE="\$TODO_DIR/done.txt"
+REPORT_FILE="\$TODO_DIR/report.txt"
+TMP_FILE="\$TODO_DIR/todo.tmp"
 touch used_config
 EOF
 

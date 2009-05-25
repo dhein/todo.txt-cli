@@ -20,7 +20,7 @@ EOF
 # check the sort filter
 #
 TEST_TODO1_=todo1.cfg
-sed -e "s/^.*export TODOTXT_SORT_COMMAND=.*$/export TODOTXT_SORT_COMMAND='env LC_COLLATE=C sort -r -f -k2'/" "${TEST_TODO_}" > "${TEST_TODO1_}"
+sed -e "s/^.*SORT_COMMAND=.*$/SORT_COMMAND='env LC_COLLATE=C sort -r -f -k2'/" "${TEST_TODO_}" > "${TEST_TODO1_}"
 
 test_todo_session 'checking TODOTXT_SORT_COMMAND' <<EOF
 >>> todo.sh ls
@@ -42,7 +42,7 @@ EOF
 # check the final filter
 #
 TEST_TODO2_=todo2.cfg
-sed -e "s%^.*export TODOTXT_FINAL_FILTER=.*$%export TODOTXT_FINAL_FILTER=\"sed 's/^\\\(..\\\{20\\\}\\\).....*$/\\\1.../'\"%" "${TEST_TODO_}" > "${TEST_TODO2_}"
+sed -e "s%^.*FINAL_FILTER=.*$%FINAL_FILTER=\"sed 's/^\\\(..\\\{20\\\}\\\).....*$/\\\1.../'\"%" "${TEST_TODO_}" > "${TEST_TODO2_}"
 
 test_todo_session 'checking TODOTXT_FINAL_FILTER' <<EOF
 >>> todo.sh -d "$TEST_TODO2_" ls
