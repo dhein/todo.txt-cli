@@ -45,17 +45,17 @@ EndUsage
 # see which argument, if any was specified
 #
 if [ x"$1" == x ] ; then
-  TODO_CD_TO_="$TODO_DIR"
+  TODOTXT_CD_TO_="$TODOTXT_TODO_DIR"
 elif echo "$1" | grep -iq ^todo$ ; then
-  TODO_CD_TO_="$TODO_DIR"
+  TODOTXT_CD_TO_="$TODOTXT_TODO_DIR"
 elif echo "$1" | grep -iq ^addons$ ; then
-  if [ x"$TODO_ACTIONS_DIR" == x ] ; then
-    TODO_CD_TO_="$HOME/.todo.actions.d"
+  if [ x"$TODOTXT_ACTIONS_DIR" == x ] ; then
+    TODOTXT_CD_TO_="$HOME/.todo.actions.d"
   else
-    TODO_CD_TO_="$TODO_ACTIONS_DIR"
+    TODOTXT_CD_TO_="$TODOTXT_ACTIONS_DIR"
   fi
 elif echo "$1" | grep -iq ^cfg$ ; then
-  TODO_CD_TO_=$(echo "$TODOTXT_CFG_FILE" | sed 's|\(.*\)/todo.cfg|\1|')
+  TODOTXT_CD_TO_=$(echo "$TODOTXT_CFG_FILE" | sed 's|\(.*\)/todo.cfg|\1|')
 else
   echo "'$1' is an invalid argument."
   exit
@@ -63,9 +63,9 @@ fi
 
 # prefix spaces with backslash
 #
-TODO_CD_TO_=$(echo "$TODO_CD_TO_" | sed 's|[[:space:]]|\\ |g')
+TODOTXT_CD_TO_=$(echo "$TODOTXT_CD_TO_" | sed 's|[[:space:]]|\\ |g')
 
 # change to the directory
 #
-echo "cd $TODO_CD_TO_"
+echo "cd $TODOTXT_CD_TO_"
 exit

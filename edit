@@ -45,22 +45,22 @@ EndUsage
 
 # see if an editor was supplied
 #
-TODO_EDITOR_=${EDITOR:-vi}
+TODOTXT_EDITOR_=${EDITOR:-vi}
 
 # see which file, if any was specified
 #
-TODO_CURSOR_LINE_=
+TODOTXT_CURSOR_LINE_=
 if [ x"$1" == x ] ; then
-  TODO_EDIT_FILE_="$TODO_DIR/todo.txt"
+  TODOTXT_EDIT_FILE_="$TODOTXT_TODO_DIR/todo.txt"
 elif echo "$1" | grep -iq ^[0-9][0-9]*$ ; then
-  TODO_EDIT_FILE_="$TODO_DIR/todo.txt"
-  TODO_CURSOR_LINE_="+$1"
+  TODOTXT_EDIT_FILE_="$TODOTXT_TODO_DIR/todo.txt"
+  TODOTXT_CURSOR_LINE_="+$1"
 elif echo "$1" | grep -iq ^todo$ ; then
-  TODO_EDIT_FILE_="$TODO_DIR/todo.txt"
+  TODOTXT_EDIT_FILE_="$TODOTXT_TODO_DIR/todo.txt"
 elif echo "$1" | grep -iq ^done$ ; then
-  TODO_EDIT_FILE_="$TODO_DIR/done.txt"
+  TODOTXT_EDIT_FILE_="$TODOTXT_TODO_DIR/done.txt"
 elif echo "$1" | grep -iq ^cfg$ ; then
-  TODO_EDIT_FILE_="$TODOTXT_CFG_FILE"
+  TODOTXT_EDIT_FILE_="$TODOTXT_CFG_FILE"
 else
   echo "'$1' is an invalid argument."
   exit
@@ -68,6 +68,6 @@ fi
 
 # edit the file
 #
-#echo "$TODO_EDITOR_" $TODO_CURSOR_LINE_ "$TODO_EDIT_FILE_"
-"$TODO_EDITOR_" $TODO_CURSOR_LINE_ "$TODO_EDIT_FILE_"
+#echo "$TODOTXT_EDITOR_" $TODOTXT_CURSOR_LINE_ "$TODOTXT_EDIT_FILE_"
+"$TODOTXT_EDITOR_" $TODOTXT_CURSOR_LINE_ "$TODOTXT_EDIT_FILE_"
 exit

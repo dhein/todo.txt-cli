@@ -64,10 +64,13 @@ EndUsage
 
        Note:
          You can set default options for this addon by setting
-         the varialbe TODOTXT_LS_DEFOPT_ in your config file.
+         the variable TODOTXT_LS_DEFOPT_ in your config file.
 
          For example:
-             setvar TODOTXT_LS_DEFOPT_ "-m 30 -l 80"
+             if [ -z "$TODOTXT_LS_DEFOPT_" ]
+             then
+               export TODOTXT_LS_DEFOPT_="-m 30 -l 79"
+             fi
 
 EndUsage
   exit

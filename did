@@ -69,7 +69,7 @@ if "$TODO_SH" command add "$@"; then
     # getting the number item: 
     # it's simply the last item added to the file
     #
-    line=`wc -l "$TODO_FILE" | sed "s/^[[:space:]]*//" | cut -d' ' -f1`
+    line=`wc -l "$TODOTXT_TODO_FILE" | sed "s/^[[:space:]]*//" | cut -d' ' -f1`
 
     # now mark the item done
     #
@@ -82,7 +82,7 @@ if "$TODO_SH" command add "$@"; then
             # adjust todo.txt
             [ $TODOTXT_VERBOSE -gt 0 ] && echo \
                 "TODO: Adjusting $line to $DID_DATE_"
-            sed -i.bak $line"s|^x [0-9]\{4\}-[0-9]\{1,2\}-[0-9]\{1,2\}[[:space:]]|x $DID_DATE_ |" "$TODO_FILE"
+            sed -i.bak $line"s|^x [0-9]\{4\}-[0-9]\{1,2\}-[0-9]\{1,2\}[[:space:]]|x $DID_DATE_ |" "$TODOTXT_TODO_FILE"
         fi
     fi
 fi
