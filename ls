@@ -195,9 +195,9 @@ fi
 
 if [ 10 -lt $LIST_LEN_  ] ; then
   LL1_=$((LIST_LEN_ - 3))
-  LL2_=$((LIST_LEN_ - 3 - 4))
+  LL2_=$((LIST_LEN_ - 3 - 1))
   LL1_CMD_="sed 's/^\(\\\\033\[[0-9;]*m\)\(.\{$LL1_\}\).....*\(\\\\033\[[0-9;]*m\)$/\1\2...\3/'"
-  LL2_CMD_="sed 's/^\([^\][^0][^3][^3].\{$LL2_\}\).....*$/\1.../'"
+  LL2_CMD_="sed 's/^\([^\].\{$LL2_\}\).....*$/\1.../'"
   export TODOTXT_FINAL_FILTER="$LL1_CMD_ | $LL2_CMD_"
 fi
 
