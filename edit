@@ -51,14 +51,14 @@ TODOTXT_EDITOR_=${EDITOR:-vi}
 #
 TODOTXT_CURSOR_LINE_=
 if [ x"$1" == x ] ; then
-  TODOTXT_EDIT_FILE_="$TODOTXT_TODO_DIR/todo.txt"
+  TODOTXT_EDIT_FILE_="$TODO_FILE"
 elif echo "$1" | grep -iq ^[0-9][0-9]*$ ; then
-  TODOTXT_EDIT_FILE_="$TODOTXT_TODO_DIR/todo.txt"
+  TODOTXT_EDIT_FILE_="$TODO_FILE"
   TODOTXT_CURSOR_LINE_="+$1"
 elif echo "$1" | grep -iq ^todo$ ; then
-  TODOTXT_EDIT_FILE_="$TODOTXT_TODO_DIR/todo.txt"
+  TODOTXT_EDIT_FILE_="$TODO_FILE"
 elif echo "$1" | grep -iq ^done$ ; then
-  TODOTXT_EDIT_FILE_="$TODOTXT_TODO_DIR/done.txt"
+  TODOTXT_EDIT_FILE_="$DONE_FILE"
 elif echo "$1" | grep -iq ^cfg$ ; then
   TODOTXT_EDIT_FILE_="$TODOTXT_CFG_FILE"
 else
